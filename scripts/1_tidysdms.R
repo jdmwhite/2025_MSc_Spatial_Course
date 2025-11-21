@@ -1,6 +1,6 @@
-# RGB Kew MSc Spatial Analysis Course 2024
-# Joseph White, Carolina Tovar, Moabe Fernandes, Felix Lim, Jenny Williams
-# 2024/11/27
+# RGB Kew MSc Spatial Analysis Course 2025
+# Joseph White, Carolina Tovar, Moabe Fernandes, Felix Lim, Liam Trethowan, Jenny Williams
+# 2025/12/01
 
 #### Load in libraries ----
 library(rgbif)
