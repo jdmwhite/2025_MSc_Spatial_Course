@@ -9,7 +9,7 @@
 
 #### Guide to running the R scripts:
 
-1.  Start by opening the 2024_MSc_Spatial_Course.RProj file in your documents browser. Only continue if in the top right corner of your RStudio session you see the text 2024_MSc_Spatial_Course. If you see this, you have successfully opened the .RProj file. If you do not see this, go File --\> Open Project --\> Navigate to and select the .RProj file.
+1.  Start by opening the 2025_MSc_Spatial_Course.RProj file in your documents browser. Only continue if in the top right corner of your RStudio session you see the text 2025_MSc_Spatial_Course. If you see this, you have successfully opened the .RProj file. If you do not see this, go File --\> Open Project --\> Navigate to and select the .RProj file.
 2.  In your R Studio session, open the 'Files' tab.
 
 ##### To run the .R scripts:
