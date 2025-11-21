@@ -418,22 +418,22 @@ pred_binary %>%
 
 # visualise the different projections
 par(mfrow=c(1,2))
-plot(pred_binary)
+plot(pred_binary, col = c('gray', 'orange'))
 plot(vect(prot_areas_all), add = TRUE)
-plot(pred_binary_proj)
+plot(pred_binary_proj, col = c('gray', 'orange'))
 plot(vect(prot_areas_all_proj), add = TRUE)
 
 # What is the area of predicted species presences?
 # we select and sum only the cells with 1's, then multiply this by the size of the raster cells and lastly divide this by meters to get a result in km2.
 pres_area <- (sum(pred_binary_proj[] == 1, na.rm = TRUE) * (res(pred_binary_proj)[1]*res(pred_binary_proj)[2]) / (1000^2))
-paste('The area of species presences is',pres_area, 'km2')
+paste('The predicted area of species presences is',round(pres_area), 'km2')
 
 # Calculate the area of all cells
-all_area <- (sum(!is.na(pred_binary_proj[])) * (res(pred_binary_proj)[1]*res(pred_binary_proj)[2]) / (1000^2))
-paste('The area of all cells is',all_area, 'km2')
+all_area_km2 <- (sum(!is.na(pred_binary_proj[])) * (res(pred_binary_proj)[1]*res(pred_binary_proj)[2]) / (1000^2))
+paste('The area of all cells in Madagascar is',round(all_area_km2), 'km2')
 
 # And lastly calculate the percentage of coverage of our species across all of Madagascar
-paste('The species presences cover',round(pres_area/all_area*100, 2), '% of Madagascar')
+paste('The species presences cover',round(pres_area/all_area_km2*100, 2), '% of Madagascar')
 
 #### We now want to work out what % of our species is found within Protected Areas
 
@@ -441,7 +441,8 @@ paste('The species presences cover',round(pres_area/all_area*100, 2), '% of Mada
 sum_cover <- function(x){
   list(x %>%
          group_by(value) %>%
-         summarize(total_area = sum(coverage_area)))
+         summarize(total_area_m2 = sum(coverage_area),
+                   total_area_km2 = total_area_m2/(1000^2)))
 }
 
 # extract the amount of area covered 
@@ -457,7 +458,7 @@ head(extract_df)
 # we can now sum all of the area that overlaps with the protected areas for presences (i.e. 1's) and divide this by the total area of all presences
 area_under_pas <- extract_df %>% 
   filter(value == 1) %>% 
-  summarise(total_area_under_pas = sum(total_area)/(1000^2))
+  summarise(total_area_under_pas_km2 = sum(total_area_km2))
 
 paste(round(area_under_pas/pres_area * 100, 2),'% of the predicted presences are found within protected areas')
 
@@ -467,11 +468,11 @@ prot_areas_all_proj_area <- prot_areas_all_proj %>%
 
 ggplot() +
   geom_spatvector(data = mad, fill = 'white') +
-  geom_spatvector(data = prot_areas_all_proj_area, aes(fill = total_area)) +
+  geom_spatvector(data = prot_areas_all_proj_area, aes(fill = total_area_km2)) +
   scale_fill_continuous(name = 'Total area of\nspecies covered\n(km2)', type = 'viridis') +
   theme_bw()
 
-mapview::mapview(st_as_sf(prot_areas_all_proj_area), zcol = 'total_area')
+mapview::mapview(st_as_sf(prot_areas_all_proj_area), zcol = 'total_area_km2')
 
 # Our final step is to join our IUCN protected area categories onto our presence area data.frame. This will provide us with some information on what percentage of our species area is conserved under different categories. This provides important context on both the quality and quantity of protected areas overlapping with our species range:
 iucn_cat <- prot_areas_all_proj %>% 
@@ -482,8 +483,8 @@ extract_df %>%
   left_join(iucn_cat, by = 'ORIG_NAME', relationship = 'many-to-many') %>% 
   filter(value == 1) %>%
   group_by(IUCN_CAT) %>%
-  summarise(area = sum(total_area)/(1000^2)) %>%
-  mutate(perc = round(area/sum(area) * 100, 2))
+  summarise(area_km2 = sum(total_area_km2)) %>%
+  mutate(perc = round(area_km2/sum(area_km2) * 100, 2))
 
 #### END ####
 
